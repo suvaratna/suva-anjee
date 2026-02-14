@@ -1,0 +1,1038 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine? ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Animated background with floating hearts */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ffeef8 0%, #ffe0f0 50%, #ffd4e5 100%);
+            z-index: -1;
+            transition: background 1s ease;
+        }
+
+        .background.gallery-mode {
+            background: linear-gradient(135deg, #f5e6ff 0%, #e6d9ff 50%, #d9ccff 100%);
+        }
+
+        .floating-heart {
+            position: absolute;
+            font-size: 20px;
+            color: rgba(255, 105, 180, 0.3);
+            animation: float linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Screen container */
+        .screen {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .screen.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Envelope Screen */
+        .envelope-container {
+            text-align: center;
+        }
+
+        .envelope-hint {
+            font-size: 1.2rem;
+            color: #d63384;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .envelope {
+            position: relative;
+            width: 280px;
+            height: 180px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .envelope:hover {
+            transform: scale(1.05);
+        }
+
+        .envelope-body {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border: 3px solid #d63384;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(214, 51, 132, 0.3);
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-top: 90px solid #ff69b4;
+            transform-origin: top center;
+            transition: transform 0.8s ease;
+            z-index: 2;
+        }
+
+        .envelope.open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        .envelope-heart {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            color: #d63384;
+            z-index: 1;
+        }
+
+        /* Message Screen */
+        .message-container {
+            text-align: center;
+            padding: 20px;
+            max-width: 90%;
+        }
+
+        .message-title {
+            font-size: 2.5rem;
+            color: #d63384;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .button-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-family: 'Georgia', serif;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #ff6b9d 0%, #d63384 100%);
+            color: white;
+            position: relative;
+        }
+
+        .btn-yes.grow {
+            transform: scale(1.2);
+            box-shadow: 0 8px 30px rgba(214, 51, 132, 0.5);
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #ffc0cb 0%, #ffb3c1 100%);
+            color: #d63384;
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .btn-memories {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            animation: fadeInUp 1s ease 0.5s backwards;
+        }
+
+        .btn-memories:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.5);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Celebration Screen */
+        .celebration-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .celebration-title {
+            font-size: 3rem;
+            color: #d63384;
+            margin-bottom: 30px;
+            animation: celebrationBounce 1s ease;
+        }
+
+        @keyframes celebrationBounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-30px);
+            }
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .celebration-message {
+            font-size: 1.8rem;
+            color: #ff69b4;
+            margin-bottom: 20px;
+        }
+
+        /* Floating hearts for celebration */
+        .celebration-heart {
+            position: absolute;
+            font-size: 40px;
+            animation: celebrateFloat 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes celebrateFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-50px) rotate(180deg);
+            }
+        }
+
+        /* Confetti */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff69b4;
+            animation: confettiFall 3s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* ========== GALLERY STYLES ========== */
+        .gallery-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 40px 20px;
+        }
+
+        .gallery-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #8b5cf6;
+            margin-bottom: 10px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .gallery-subtitle {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #a78bfa;
+            margin-bottom: 40px;
+            animation: fadeInDown 1.2s ease;
+        }
+
+        .photos-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-bottom: 40px;
+        }
+
+        .photo-card {
+            width: 280px;
+            background: white;
+            padding: 15px;
+            padding-bottom: 60px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            transform: rotate(0deg);
+            animation: photoAppear 0.6s ease backwards;
+        }
+
+        .photo-card:nth-child(odd) {
+            transform: rotate(-2deg);
+        }
+
+        .photo-card:nth-child(even) {
+            transform: rotate(2deg);
+        }
+
+        .photo-card:hover {
+            transform: rotate(0deg) scale(1.05) !important;
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4);
+            z-index: 10;
+        }
+
+        @keyframes photoAppear {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .photo-card:nth-child(1) { animation-delay: 0.1s; }
+        .photo-card:nth-child(2) { animation-delay: 0.2s; }
+        .photo-card:nth-child(3) { animation-delay: 0.3s; }
+        .photo-card:nth-child(4) { animation-delay: 0.4s; }
+        .photo-card:nth-child(5) { animation-delay: 0.5s; }
+        .photo-card:nth-child(6) { animation-delay: 0.6s; }
+        .photo-card:nth-child(7) { animation-delay: 0.7s; }
+        .photo-card:nth-child(8) { animation-delay: 0.8s; }
+        .photo-card:nth-child(9) { animation-delay: 0.9s; }
+
+        .photo-image {
+            width: 100%;
+            height: 280px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-placeholder {
+            color: #a78bfa;
+        }
+
+        .photo-caption {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+            font-style: italic;
+            padding: 0 10px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .photo-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .photo-modal-content {
+            background: white;
+            padding: 30px;
+            padding-bottom: 80px;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modalSlideUp 0.4s ease;
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .photo-modal-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            margin-bottom: 20px;
+        }
+
+        .photo-modal-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-modal-caption {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #333;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+
+        .photo-modal-memory {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #666;
+            line-height: 1.6;
+            padding: 0 20px;
+        }
+
+        .photo-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .photo-modal-close:hover {
+            background: #7c3aed;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .message-title {
+                font-size: 1.8rem;
+            }
+
+            .celebration-title {
+                font-size: 2rem;
+            }
+
+            .celebration-message {
+                font-size: 1.3rem;
+            }
+
+            .gallery-title {
+                font-size: 2rem;
+            }
+
+            .gallery-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .photo-card {
+                width: 250px;
+                padding-bottom: 50px;
+            }
+
+            .photo-image {
+                height: 250px;
+                font-size: 3rem;
+            }
+
+            .photo-modal-image {
+                height: 300px;
+                font-size: 4rem;
+            }
+
+            .photo-modal-caption {
+                font-size: 1.2rem;
+            }
+
+            .photo-modal-memory {
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 1.1rem;
+            }
+
+            .envelope {
+                width: 220px;
+                height: 140px;
+            }
+
+            .envelope-flap {
+                border-left: 110px solid transparent;
+                border-right: 110px solid transparent;
+                border-top: 70px solid #ff69b4;
+            }
+
+            .envelope-heart {
+                font-size: 45px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .message-title {
+                font-size: 1.5rem;
+                margin-bottom: 30px;
+            }
+
+            .gallery-title {
+                font-size: 1.6rem;
+            }
+
+            .gallery-subtitle {
+                font-size: 1rem;
+            }
+
+            .button-container {
+                gap: 20px;
+            }
+
+            .btn {
+                padding: 10px 25px;
+                font-size: 1rem;
+            }
+
+            .photo-card {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .photos-grid {
+                gap: 25px;
+            }
+
+            .photo-modal-content {
+                padding: 20px;
+                padding-bottom: 60px;
+            }
+        }
+
+        /* Hidden audio element */
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="background" id="background"></div>
+
+    <!-- Envelope Screen -->
+    <div class="screen active" id="envelopeScreen">
+        <div class="envelope-container">
+            <div class="envelope-hint">✨ Click to open ✨</div>
+            <div class="envelope" id="envelope">
+                <div class="envelope-body">
+                    <div class="envelope-heart">❤️</div>
+                </div>
+                <div class="envelope-flap"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Screen -->
+    <div class="screen" id="messageScreen">
+        <div class="message-container">
+            <h1 class="message-title">Will you be my Valentine? ❤️</h1>
+            <div class="button-container" id="buttonContainer">
+                <button class="btn btn-yes" id="yesBtn">Yes 💖</button>
+                <button class="btn btn-no" id="noBtn">No 😢</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration Screen -->
+    <div class="screen" id="celebrationScreen">
+        <div class="celebration-container">
+            <h1 class="celebration-title">🎉 Yay! 🎉</h1>
+            <p class="celebration-message">I love you forever ❤️</p>
+            <div style="font-size: 4rem; margin-top: 20px;">💕✨💖✨💕</div>
+            <button class="btn btn-memories" id="memoriesBtn" style="margin-top: 40px;">See Our Memories 📸</button>
+        </div>
+    </div>
+
+    <!-- Gallery Screen -->
+    <div class="screen" id="galleryScreen">
+        <div class="gallery-container">
+            <h1 class="gallery-title">Our Beautiful Journey Together 💕</h1>
+            <p class="gallery-subtitle">Click on any photo to see the memory</p>
+            
+            <div class="photos-grid" id="photosGrid">
+                <!-- Photos will be added dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo Modal -->
+    <div class="photo-modal" id="photoModal">
+        <div class="photo-modal-content">
+            <button class="photo-modal-close" id="modalClose">×</button>
+            <div class="photo-modal-image" id="modalImage">
+                <span class="photo-placeholder">📸</span>
+            </div>
+            <div class="photo-modal-caption" id="modalCaption"></div>
+            <div class="photo-modal-memory" id="modalMemory"></div>
+        </div>
+    </div>
+
+    <!-- Optional background music (will play after user interaction) -->
+    <audio id="bgMusic" loop>
+        <!-- You can add a romantic music URL here -->
+        <!-- <source src="romantic-music.mp3" type="audio/mpeg"> -->
+    </audio>
+
+    <script>
+        // ========================================
+        // CUSTOMIZE YOUR PHOTOS HERE
+        // ========================================
+        const photos = [
+            {
+                emoji: '�',
+                caption: 'Date Night Drive',
+                memory: 'Inside the car, heading back from our date. Just the two of us, your smile lighting up the night. These simple moments with you are my favorite.',
+                imageUrl: 'photos/photo1.jpg'
+            },
+            {
+                emoji: '🏨',
+                caption: 'Honeymoon at Soaltee',
+                memory: 'Our honeymoon at the beautiful Soaltee Hotel. You looked absolutely stunning. Beginning our forever together in the most perfect way.',
+                imageUrl: 'photos/photo2.jpg'
+            },
+            {
+                emoji: '🍽️',
+                caption: 'Dinner at Twenty Fourty',
+                memory: 'A special dinner night at Twenty Fourty. Every date with you feels like a celebration. Looking into your eyes across the table, I knew I was home.',
+                imageUrl: 'photos/photo3.jpg'
+            },
+            {
+                emoji: '🛕',
+                caption: 'Family Blessing at Shreekali',
+                memory: 'After our marriage, at Shreekali temple with family. The day we received blessings for our new journey together. You standing beside me made everything perfect.',
+                imageUrl: 'photos/photo4.jpg'
+            },
+            {
+                emoji: '👗',
+                caption: 'I Wished You Didn\'t Have to Go',
+                memory: 'You were getting ready to go back to your home from mine. I just kept looking at you, not wanting to let you go. You just looked so gorgeous and so mine.',
+                imageUrl: 'photos/photo5.jpg'
+            },
+            {
+                emoji: '🌅',
+                caption: 'The Mirror Selfie',
+                memory: 'The morning after our wedding, Waking up next to you for the first time as husband and wife. The beginning of all our mornings together.',
+                imageUrl: 'photos/photo6.jpg'
+            }
+        ];
+
+        // Create floating hearts in background
+        function createFloatingHearts() {
+            const background = document.getElementById('background');
+            const hearts = ['❤️', '💕', '💖', '💗', '💓', '💝'];
+            
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                heart.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                background.appendChild(heart);
+                
+                // Remove heart after animation
+                setTimeout(() => heart.remove(), 20000);
+            }, 800);
+        }
+
+        createFloatingHearts();
+
+        // Envelope opening
+        const envelope = document.getElementById('envelope');
+        const envelopeScreen = document.getElementById('envelopeScreen');
+        const messageScreen = document.getElementById('messageScreen');
+
+        envelope.addEventListener('click', () => {
+            envelope.classList.add('open');
+            
+            // Transition to message screen after animation
+            setTimeout(() => {
+                envelopeScreen.classList.remove('active');
+                messageScreen.classList.add('active');
+            }, 1000);
+        });
+
+        // Yes button - grows when mouse/finger gets close
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const buttonContainer = document.getElementById('buttonContainer');
+
+        // Track mouse/touch position
+        let mouseX = 0;
+        let mouseY = 0;
+
+        function updateMousePosition(e) {
+            if (e.touches && e.touches.length > 0) {
+                mouseX = e.touches[0].clientX;
+                mouseY = e.touches[0].clientY;
+            } else {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            }
+        }
+
+        document.addEventListener('mousemove', updateMousePosition);
+        document.addEventListener('touchmove', updateMousePosition);
+
+        // Check distance to Yes button and grow if close
+        function checkYesButtonProximity() {
+            if (!messageScreen.classList.contains('active')) return;
+
+            const rect = yesBtn.getBoundingClientRect();
+            const btnCenterX = rect.left + rect.width / 2;
+            const btnCenterY = rect.top + rect.height / 2;
+            
+            const distance = Math.sqrt(
+                Math.pow(mouseX - btnCenterX, 2) + 
+                Math.pow(mouseY - btnCenterY, 2)
+            );
+            
+            // Grow if within 150px
+            if (distance < 150) {
+                yesBtn.classList.add('grow');
+            } else {
+                yesBtn.classList.remove('grow');
+            }
+        }
+
+        setInterval(checkYesButtonProximity, 50);
+
+        // No button - runs away from cursor/finger
+        let noBtnInitialized = false;
+
+        function initializeNoButton() {
+            if (noBtnInitialized) return;
+            noBtnInitialized = true;
+            
+            // Position No button initially
+            const container = buttonContainer.getBoundingClientRect();
+            noBtn.style.position = 'relative';
+            noBtn.style.left = '0px';
+            noBtn.style.top = '0px';
+        }
+
+        function moveNoButton() {
+            if (!messageScreen.classList.contains('active')) return;
+
+            const rect = noBtn.getBoundingClientRect();
+            const btnCenterX = rect.left + rect.width / 2;
+            const btnCenterY = rect.top + rect.height / 2;
+            
+            const distance = Math.sqrt(
+                Math.pow(mouseX - btnCenterX, 2) + 
+                Math.pow(mouseY - btnCenterY, 2)
+            );
+            
+            // Move away if cursor/finger is within 100px
+            if (distance < 100) {
+                initializeNoButton();
+                
+                // Calculate direction away from cursor
+                const angle = Math.atan2(btnCenterY - mouseY, btnCenterX - mouseX);
+                const moveDistance = 100;
+                
+                let newX = parseFloat(noBtn.style.left || 0) + Math.cos(angle) * moveDistance;
+                let newY = parseFloat(noBtn.style.top || 0) + Math.sin(angle) * moveDistance;
+                
+                // Keep within screen bounds
+                const maxX = window.innerWidth - rect.width - 50;
+                const maxY = window.innerHeight - rect.height - 50;
+                const minX = -rect.left + 20;
+                const minY = -rect.top + 20;
+                
+                newX = Math.max(minX, Math.min(maxX, newX));
+                newY = Math.max(minY, Math.min(maxY, newY));
+                
+                noBtn.style.left = newX + 'px';
+                noBtn.style.top = newY + 'px';
+            }
+        }
+
+        setInterval(moveNoButton, 50);
+
+        // Touch event for No button on mobile
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moveNoButton();
+        });
+
+        // Yes button clicked - show celebration
+        const celebrationScreen = document.getElementById('celebrationScreen');
+
+        yesBtn.addEventListener('click', () => {
+            messageScreen.classList.remove('active');
+            celebrationScreen.classList.add('active');
+            
+            // Create celebration hearts
+            createCelebrationHearts();
+            
+            // Create confetti
+            createConfetti();
+            
+            // Play music if available (user interaction enables autoplay)
+            const bgMusic = document.getElementById('bgMusic');
+            if (bgMusic.src) {
+                bgMusic.play().catch(e => console.log('Music autoplay prevented'));
+            }
+        });
+
+        // Create floating hearts for celebration
+        function createCelebrationHearts() {
+            const screen = celebrationScreen;
+            const hearts = ['❤️', '💕', '💖', '💗', '💓', '💝', '💞', '💟'];
+            
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'celebration-heart';
+                    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                    heart.style.left = Math.random() * 90 + 5 + '%';
+                    heart.style.top = Math.random() * 90 + 5 + '%';
+                    heart.style.animationDelay = Math.random() * 2 + 's';
+                    screen.appendChild(heart);
+                }, i * 200);
+            }
+        }
+
+        // Create confetti effect
+        function createConfetti() {
+            const screen = celebrationScreen;
+            const colors = ['#ff69b4', '#ff1493', '#ffc0cb', '#ff6b9d', '#d63384', '#ffb3c1'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    screen.appendChild(confetti);
+                    
+                    // Remove after animation
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 50);
+            }
+            
+            // Continue creating confetti
+            setTimeout(createConfetti, 3000);
+        }
+
+        // Prevent No button from being clicked (it will always run away)
+        noBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            moveNoButton();
+        });
+
+        // Memories button - show gallery screen
+        const memoriesBtn = document.getElementById('memoriesBtn');
+        const galleryScreen = document.getElementById('galleryScreen');
+        const background = document.getElementById('background');
+
+        memoriesBtn.addEventListener('click', () => {
+            celebrationScreen.classList.remove('active');
+            galleryScreen.classList.add('active');
+            background.classList.add('gallery-mode');
+            createPhotoGallery();
+        });
+
+        // Create photo gallery
+        function createPhotoGallery() {
+            const grid = document.getElementById('photosGrid');
+            grid.innerHTML = ''; // Clear existing photos
+            
+            photos.forEach((photo, index) => {
+                const card = document.createElement('div');
+                card.className = 'photo-card';
+                
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'photo-image';
+                
+                if (photo.imageUrl) {
+                    const img = document.createElement('img');
+                    img.src = photo.imageUrl;
+                    img.alt = photo.caption;
+                    imageDiv.appendChild(img);
+                } else {
+                    const placeholder = document.createElement('span');
+                    placeholder.className = 'photo-placeholder';
+                    placeholder.textContent = photo.emoji;
+                    imageDiv.appendChild(placeholder);
+                }
+                
+                const caption = document.createElement('div');
+                caption.className = 'photo-caption';
+                caption.textContent = photo.caption;
+                
+                card.appendChild(imageDiv);
+                card.appendChild(caption);
+                
+                card.addEventListener('click', () => openPhotoModal(photo));
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Photo modal
+        const photoModal = document.getElementById('photoModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalCaption = document.getElementById('modalCaption');
+        const modalMemory = document.getElementById('modalMemory');
+        const modalClose = document.getElementById('modalClose');
+
+        function openPhotoModal(photo) {
+            modalImage.innerHTML = '';
+            
+            if (photo.imageUrl) {
+                const img = document.createElement('img');
+                img.src = photo.imageUrl;
+                img.alt = photo.caption;
+                modalImage.appendChild(img);
+            } else {
+                const placeholder = document.createElement('span');
+                placeholder.className = 'photo-placeholder';
+                placeholder.textContent = photo.emoji;
+                modalImage.appendChild(placeholder);
+            }
+            
+            modalCaption.textContent = photo.caption;
+            modalMemory.textContent = photo.memory;
+            
+            photoModal.classList.add('show');
+        }
+
+        function closePhotoModal() {
+            photoModal.classList.remove('show');
+        }
+
+        modalClose.addEventListener('click', closePhotoModal);
+        photoModal.addEventListener('click', (e) => {
+            if (e.target === photoModal) {
+                closePhotoModal();
+            }
+        });
+    </script>
+</body>
+</html>
